@@ -9,7 +9,7 @@ import { postRequest } from "./utils/api";
 import { putRequest } from "./utils/api";
 import { deleteRequest } from "./utils/api";
 import { getRequest } from "./utils/api";
-import {initMenu} from "./utils/menu";
+import { initMenu } from "./utils/menu";
 
 Vue.prototype.postRequest = postRequest;
 Vue.prototype.putRequest = putRequest;
@@ -20,22 +20,22 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 
 router.beforeEach((to, from, next) => {
-  if (to.path == '/') {
-    next();
+  if (window.localStorage.getItem("user") && to.path == '/home') {
+    getRequest('/system/isAuthenticated').then(resp => {
+      if (resp.status === 200) {
+        initMenu(router, store);
+        next();
+      }
+    }).catch(failResponse => {});
+  }
+  if (window.localStorage.getItem("user")) {
+    getRequest('/system/isAuthenticated').then(resp => {
+      if (resp.status === 200) {
+        next();
+      }
+    }).catch(failResponse => {});
   } else {
-    if (window.localStorage.getItem("user")) {
-      getRequest('/system/isAuthenticated').then(resp => {
-        if (resp.status === 200) {
-          initMenu(router, store);
-          next();
-        }
-        else {
-          next('/');
-        }
-      }).catch(failResponse => { });
-    } else {
-      next('/');
-    }
+    next();
   }
 })
 

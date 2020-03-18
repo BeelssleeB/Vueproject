@@ -21,6 +21,18 @@
         v-model="loginForm.userPassword"
       ></el-input>
     </el-form-item>
+    <el-form-item prop="code">
+      <el-input
+        size="normal"
+        type="text"
+        v-model="loginForm.code"
+        auto-complete="off"
+        placeholder="点击图片更换验证码"
+        @keydown.enter.native="submitLogin"
+        style="width: 230px;margin-right:20px;"
+      ></el-input>
+      <img :src="vcUrl" @click="updateVerifyCode" alt />
+    </el-form-item>
     <el-form-item
       style="margin:-10px 0px 0px;display: flex;
   justify-content: start;"
@@ -33,8 +45,10 @@
         v-model="loginForm.rememberMe"
       ></el-checkbox>
     </el-form-item>
-    <el-form-item>
+    <el-form-item style="margin:15px 20px;">
       <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+    </el-form-item>
+     <el-form-item style="margin:15px 20px;">
       <el-button type="info" plain @click="resetForm('ruleForm')">重置</el-button>
     </el-form-item>
   </el-form>
@@ -46,10 +60,12 @@ export default {
   name: "Login",
   data() {
     return {
+      vcUrl: "system/verifyCode?time=" + new Date(),
       loginForm: {
         userName: "wang",
         userPassword: "123",
-        rememberMe: true
+        code: "",
+        rememberMe: false
       },
       rules: {
         userName: [
@@ -57,11 +73,15 @@ export default {
         ],
         userPassword: [
           { required: true, message: "请输入密码", trigger: "blur" }
-        ]
+        ],
+        code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
       }
     };
   },
   methods: {
+    updateVerifyCode() {
+      this.vcUrl = "system/verifyCode?time=" + new Date();
+    },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
@@ -72,7 +92,7 @@ export default {
                 this.$store.commit("login", resp.obj);
                 this.$router.replace("/home");
               } else {
-                Message.error({ message: "登录失败" });
+                this.vcUrl = "/verifyCode?time=" + new Date();
               }
             })
             .catch(failResponse => {});
@@ -124,15 +144,13 @@ body {
   letter-spacing: 1px;
 }
 
-.el-form-item__content {
+.el-form-item__content{
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .el-form-item__content button {
   width: 100%;
-  margin: 8px;
 }
 </style>
