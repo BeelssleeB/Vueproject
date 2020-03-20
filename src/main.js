@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import './assets/styles/icon/iconfont.css'
 
 import { postRequest } from "./utils/api";
 import { putRequest } from "./utils/api";
@@ -26,14 +27,19 @@ router.beforeEach((to, from, next) => {
         initMenu(router, store);
         next();
       }
-    }).catch(failResponse => {});
+    }).catch(failResponse => { });
   }
-  if (window.localStorage.getItem("user")) {
-    getRequest('/system/isAuthenticated').then(resp => {
-      if (resp.status === 200) {
-        next();
-      }
-    }).catch(failResponse => {});
+  if (to.meta.requireAuth) {
+    if (window.localStorage.getItem("user")) {
+      getRequest('/system/isAuthenticated').then(resp => {
+        if (resp.status === 200) {
+          next();
+        }
+      }).catch(failResponse => { });
+    }
+    else{
+      next();
+    }
   } else {
     next();
   }
