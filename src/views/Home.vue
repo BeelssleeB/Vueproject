@@ -109,7 +109,9 @@ export default {
       } else if (cmd == "userInfo") {
         this.$router.push("/userinfo");
       } else if (cmd == "modifyPassword") {
+        this.$router.push("/pwd");
       } else if (cmd == "modifyAvatar") {
+        this.$router.push("/avatar");
       }
     }
   }
