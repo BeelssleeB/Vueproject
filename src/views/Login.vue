@@ -1,6 +1,6 @@
 <template>
 <body id="poster">
-  <el-form :model="loginForm" :rules="rules" ref="ruleForm" class="loginContainer">
+  <el-form ref="loginForm" :model="loginForm" :rules="rules" class="loginContainer">
     <h3 class="login_title">请登录系统</h3>
     <el-form-item prop="username" size="medium">
       <el-input
@@ -28,7 +28,7 @@
         v-model="loginForm.code"
         auto-complete="off"
         placeholder="点击图片更换验证码"
-        @keydown.enter.native="submitLogin"
+        @keydown.enter.native="submitForm"
         style="width: 230px;margin-right:20px;"
       ></el-input>
       <img :src="vcUrl" @click="updateVerifyCode" alt />
@@ -46,10 +46,10 @@
       ></el-checkbox>
     </el-form-item>
     <el-form-item style="margin:15px 20px;">
-      <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+      <el-button type="primary" @click="submitForm">登录</el-button>
     </el-form-item>
      <el-form-item style="margin:15px 20px;">
-      <el-button type="info" plain @click="resetForm('ruleForm')">重置</el-button>
+      <el-button type="info" plain @click="resetForm">重置</el-button>
     </el-form-item>
   </el-form>
 </body>
@@ -82,8 +82,8 @@ export default {
     updateVerifyCode() {
       this.vcUrl = "system/verifyCode?time=" + new Date();
     },
-    submitForm(formName) {
-      this.$refs[formName].validate(valid => {
+    submitForm() {
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.postRequest("/system/login", this.loginForm)
             .then(resp => {
@@ -102,8 +102,8 @@ export default {
         }
       });
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.$refs.loginForm.resetFields();
     },
     selecteChange(value) {
       //this.$store.commit("remember", value);

@@ -11,9 +11,14 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
+    name: 'Default',
+    redirect: '/login'
+  },
+  {
+    path: '/login',
     name: 'Login',
     component: Login,
-    meta:{
+    meta: {
       requireAuth: false
     }
   },
@@ -21,7 +26,7 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: Home,
-    meta:{
+    meta: {
       requireAuth: true
     },
     children: [
@@ -29,16 +34,25 @@ const routes = [
         path: '/userinfo',
         name: '信息修改',
         component: UserInfo,
+        meta: {
+          requireAuth: true
+        }
       },
       {
         path: '/pwd',
         name: '密码修改',
         component: PwdSet,
+        meta: {
+          requireAuth: true
+        }
       },
       {
         path: '/avatar',
         name: '头像设置',
         component: AvatarSet,
+        meta: {
+          requireAuth: true
+        }
       }
     ]
   }

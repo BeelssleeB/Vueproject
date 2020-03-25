@@ -21,13 +21,13 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 
 router.beforeEach((to, from, next) => {
-  if (window.localStorage.getItem("user") && to.path == '/home') {
+  if (to.path == '/home' && window.localStorage.getItem("user")) {
     getRequest('/system/isAuthenticated').then(resp => {
       if (resp.status === 200) {
         initMenu(router, store);
         next();
       }
-    }).catch(failResponse => { });
+    }).catch(failResponse => { next('/login') });
   }
   if (to.meta.requireAuth) {
     if (window.localStorage.getItem("user")) {
@@ -35,10 +35,10 @@ router.beforeEach((to, from, next) => {
         if (resp.status === 200) {
           next();
         }
-      }).catch(failResponse => { });
+      }).catch(failResponse => { next('/login') });
     }
     else{
-      next();
+      next('/login')
     }
   } else {
     next();
