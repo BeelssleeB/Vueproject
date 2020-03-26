@@ -35,54 +35,53 @@
       </div>
     </el-card>
 
-    <el-dialog title="修改用户信息" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="修改用户信息" :visible.sync="dialogVisible" width="25%">
       <div>
-        <table>
-          <tr>
-            <td>
-              <el-tag>用户名:</el-tag>
-            </td>
-            <td>
-              <el-input v-model="user2.userName"></el-input>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <el-tag>电话号码:</el-tag>
-            </td>
-            <td>
-              <el-input v-model="user2.phone"></el-input>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <el-tag>出生日期:</el-tag>
-            </td>
-            <td>
-              <el-date-picker
-                v-model="user2.birthday"
-                type="date"
-                placeholder="选择日期"
-                format="yyyy 年 MM 月 dd 日"
-                :default-value="user2.birthday"
-                editable
-              ></el-date-picker>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <el-tag>个性签名:</el-tag>
-            </td>
-            <td>
-              <el-input v-model="user2.userSignature"></el-input>
-            </td>
-          </tr>
-        </table>
+        <el-form :model="user2" :rules="rules">
+          <el-form-item label="用户名:" prop="userName">
+            <el-input
+              type="text"
+              maxlength="20"
+              show-word-limit
+              placeholder="请输入用户名"
+              v-model="user2.userName"
+              autofocus
+            ></el-input>
+          </el-form-item>
+
+          <el-form-item label="电话号码:" prop="phone">
+            <el-input type="text" show-word-limit placeholder="请输入电话号码" v-model="user2.phone"></el-input>
+          </el-form-item>
+
+          <el-form-item label="出生日期:" prop="birthday">
+            <el-date-picker
+              style="width: 100%;"
+              v-model="user2.birthday"
+              type="date"
+              :editable="false"
+              :clearable="false"
+              placeholder="选择日期"
+              format="yyyy 年 MM 月 dd 日"
+              :default-value="user2.birthday"
+            ></el-date-picker>
+          </el-form-item>
+
+          <el-form-item label="个性签名:" prop="userSignature">
+            <el-input
+              maxlength="100"
+              type="text"
+              show-word-limit
+              placeholder="请输入个性签名"
+              v-model="user2.userSignature"
+            ></el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="updateUserInfo">确 定</el-button>
+            <el-button type="info" plain @click="dialogVisible = false">取 消</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-      <span slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="updateUserInfo">确 定</el-button>
-      </span>
     </el-dialog>
   </div>
 </template>
@@ -94,7 +93,13 @@ export default {
     return {
       dialogVisible: false,
       user: null,
-      user2: null
+      user2: null,
+      rules: {
+        userName: [
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        birthday: [{ type: 'date', required: true, message: "请选择日期", trigger: "blur" }]
+      }
     };
   },
   mounted() {
@@ -102,21 +107,19 @@ export default {
   },
   methods: {
     updateUserInfo() {
-      //   this.putRequest("/user/putuserinfo", this.user2).then(resp => {
-      //     if (resp) {
-      //       this.dialogVisible = false;
-      //       this.initUser();
-      //     }
-      //   });
+      console.log(this.user2)
+        this.putRequest("/user/putuserinfo", this.user2).then(resp => {
+          if (resp) {
+            this.dialogVisible = false;
+            this.initUser();
+          }
+        }).catch(failResponse => {this.dialogVisible = false;});
     },
-
     showUpdateUserInfo() {
       this.dialogVisible = true;
     },
-
     initUser() {
       this.getRequest("/user/getuserinfo").then(resp => {
-        console.log(resp.user);
         if (resp.user) {
           resp.user.birthday = resp.user.birthday.substr(0, 10);
           this.user = resp.user;

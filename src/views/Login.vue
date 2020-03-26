@@ -2,7 +2,7 @@
 <body id="poster">
   <el-form ref="loginForm" :model="loginForm" :rules="rules" class="loginContainer">
     <h3 class="login_title">请登录系统</h3>
-    <el-form-item prop="username" size="medium">
+    <el-form-item prop="userName" size="medium">
       <el-input
         size="medium"
         type="text"
@@ -12,7 +12,7 @@
         autofocus="true"
       ></el-input>
     </el-form-item>
-    <el-form-item prop="password" size="medium">
+    <el-form-item prop="userPassword" size="medium">
       <el-input
         size="medium"
         show-password
@@ -36,7 +36,6 @@
     <el-form-item
       style="margin:-10px 0px 0px;display: flex;
   justify-content: start;"
-      prop="rememberMe"
     >
       <el-checkbox
         size="normal"
@@ -62,8 +61,8 @@ export default {
     return {
       vcUrl: "system/verifyCode?time=" + new Date(),
       loginForm: {
-        userName: "wang",
-        userPassword: "123",
+        userName: "",
+        userPassword: "",
         code: "",
         rememberMe: false
       },
