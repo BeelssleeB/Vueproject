@@ -98,7 +98,18 @@ export default {
         userName: [
           { required: true, message: "请输入用户名", trigger: "blur" }
         ],
-        birthday: [{ type: 'date', required: true, message: "请选择日期", trigger: "blur" }]
+        birthday: [
+          {
+            type: "date",
+            required: true,
+            message: "请选择日期",
+            trigger: "blur"
+          }
+        ],
+        phone: [{ required: true, message: "请输入电话号码", trigger: "blur" }],
+        userSignature: [
+          { required: true, message: "请输入用户签名", trigger: "blur" }
+        ]
       }
     };
   },
@@ -107,13 +118,17 @@ export default {
   },
   methods: {
     updateUserInfo() {
-      console.log(this.user2)
-        this.putRequest("/user/putuserinfo", this.user2).then(resp => {
+      console.log(this.user2);
+      this.putRequest("/user/putuserinfo", this.user2)
+        .then(resp => {
           if (resp) {
             this.dialogVisible = false;
             this.initUser();
           }
-        }).catch(failResponse => {this.dialogVisible = false;});
+        })
+        .catch(failResponse => {
+          this.dialogVisible = false;
+        });
     },
     showUpdateUserInfo() {
       this.dialogVisible = true;
