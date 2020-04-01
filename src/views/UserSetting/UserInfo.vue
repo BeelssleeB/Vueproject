@@ -136,7 +136,6 @@ export default {
     initUser() {
       this.getRequest("/user/getuserinfo").then(resp => {
         if (resp.user) {
-          resp.user.birthday = resp.user.birthday.substr(0, 10);
           this.user = resp.user;
           this.user2 = Object.assign({}, this.user);
           this.$store.commit("login", resp.user);

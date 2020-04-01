@@ -5,7 +5,6 @@ export const initMenu = (router, store) => {
         return;
     }
     getRequest("/init/menu").then(data => {
-        console.log(data)
         if (data) {
             let fmtRoutes = formatRoutes(data);
             router.addRoutes(fmtRoutes);
@@ -31,9 +30,6 @@ export const formatRoutes = (routes) => {
             name: nameCh,
             icon: icon,
             nameCh: nameCh,
-            meta: {
-                requireAuth: true
-            },
             children: children,
             component(resolve) {
                 require(['../views/' + component + '.vue'], resolve)

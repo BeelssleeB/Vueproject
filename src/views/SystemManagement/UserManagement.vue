@@ -1,28 +1,55 @@
 <template>
   <div>
+    <div style="margin-top:20px;display: flex;justify-content: space-between">
+      <div>
+        <el-input
+          placeholder="请输入用户名搜索"
+          prefix-icon="el-icon-search"
+          clearable
+          @clear="initUsers"
+          style="width: 350px;margin-right: 10px"
+          v-model="keyWord"
+          @keydown.enter.native="initUsers"
+        ></el-input>
+        <el-button icon="el-icon-search" type="primary" @click="initUsers">搜索</el-button>
+      </div>
+      <div>
+        <el-button type="primary" icon="el-icon-plus" @click="showAddUser">添加用户</el-button>
+      </div>
+    </div>
+
     <div style="margin-top: 20px">
-      <el-table :data="users" stripe border style="width: 100%" height="250">
-        <el-table-column prop="userId" label="ID" width="90"></el-table-column>
-        <el-table-column prop="userName" label="用户名" width="90"></el-table-column>
-        <el-table-column prop="name" label="姓名" align="left" width="85"></el-table-column>
-        <el-table-column prop="userSex" label="性别" align="left" width="85"></el-table-column>
-        <el-table-column prop="phone" width="95" align="left" label="电话号码"></el-table-column>
-        <el-table-column prop="birthday" width="100" align="left" label="生日日期"></el-table-column>
-        <el-table-column prop="userRole" width="50" label="用户角色"></el-table-column>
-        <el-table-column prop="userEnabled" width="50" label="用户状态">
+      <el-table :data="users" stripe border style="width: 100%" height="400">
+        <el-table-column prop="userId" label="ID" align="center" width="110"></el-table-column>
+        <el-table-column prop="userName" label="用户名" width="150"></el-table-column>
+        <el-table-column prop="name" label="姓名" align="left" width="150"></el-table-column>
+        <el-table-column prop="userSex" label="性别" align="left" width="100"></el-table-column>
+        <el-table-column prop="phone" width="150" align="left" label="电话号码"></el-table-column>
+        <el-table-column prop="birthday" width="150" align="left" label="生日日期"></el-table-column>
+        <el-table-column prop="role" width="150" label="用户角色">
           <template slot-scope="scope">
-            <el-switch disabled v-model="scope.row.userEnabled" active-value="1" inactive-value="0"></el-switch>
+            <el-tag
+              type="success"
+              style="margin-right: 2px"
+              v-for="(ro,index) in scope.row.role"
+              :key="index"
+            >{{ro.nameCh}}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="userSignature" width="100" label="用户签名" show-overflow-tooltip></el-table-column>
-        <el-table-column fixed="right" width="200" label="操作">
+        <el-table-column prop="enabled" width="120" label="用户状态">
           <template slot-scope="scope">
-            <el-button @click="showEditUser(scope.row)" size="mini">编辑</el-button>
-            <el-button @click="deleteUser(scope.row)" size="mini" type="danger">删除</el-button>
+            <el-switch disabled v-model="scope.row.enabled" active-value="1" inactive-value="0"></el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column prop="userSignature" width="250" label="用户签名" show-overflow-tooltip></el-table-column>
+        <el-table-column width="300" label="操作">
+          <template slot-scope="scope">
+            <el-button @click="showEditUser(scope.row)" size="medium" type="primary">编辑</el-button>
+            <el-button @click="deleteUser(scope.row)" size="medium" type="danger">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <div style="display: flex;justify-content: flex-end">
+      <div style="margin-top:20px;display: flex;justify-content: flex-end">
         <el-pagination
           background
           @current-change="currentChange"
@@ -31,13 +58,12 @@
           :total="total"
           :page-sizes="[2, 4, 6, 8]"
           :page-size="2"
-          hide-on-single-page
         ></el-pagination>
       </div>
     </div>
 
     <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
-      <div>
+      <div v-if="user">
         <el-form :model="user" :rules="rules">
           <el-form-item label="姓名:" prop="name">
             <el-input
@@ -64,7 +90,7 @@
           <el-form-item label="出生日期:" prop="birthday">
             <el-date-picker
               style="width: 100%;"
-              v-model="user2.birthday"
+              v-model="user.birthday"
               type="date"
               :editable="false"
               :clearable="false"
@@ -84,7 +110,7 @@
               type="text"
               show-word-limit
               placeholder="请输入个性签名"
-              v-model="user2.userSignature"
+              v-model="user.userSignature"
             ></el-input>
           </el-form-item>
 
@@ -109,6 +135,7 @@ export default {
   name: "UserManagement",
   data() {
     return {
+      keyWord: "",
       title: "",
       users: [],
       user: null,
@@ -141,7 +168,28 @@ export default {
     this.initUsers();
   },
   methods: {
-    initUsers() {},
+    showAddUser() {
+      this.user = null;
+      this.title = "添加用户";
+      this.dialogVisible = true;
+    },
+    initUsers() {
+      this.getRequest(
+        "/sys/user/?page=" +
+          this.page +
+          "&size=" +
+          this.size +
+          "&keyword=" +
+          this.keyWord
+      ).then(resp => {
+        console.log(resp);
+        if (resp) {
+          resp.data.filter(item => {item.userSex=(item.userSex==1)?"男":"女"})
+          this.users = resp.data;
+          this.total = resp.total;
+        }
+      });
+    },
     showEditUser(data) {
       this.title = "编辑用户信息";
       this.user = data;

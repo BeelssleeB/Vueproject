@@ -17,42 +17,27 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login,
-    meta: {
-      requireAuth: false
-    }
+    component: Login
   },
   {
     path: '/home',
     name: 'Home',
     component: Home,
-    meta: {
-      requireAuth: true
-    },
     children: [
       {
         path: '/userinfo',
         name: '信息修改',
-        component: UserInfo,
-        meta: {
-          requireAuth: true
-        }
+        component: UserInfo
       },
       {
         path: '/pwd',
         name: '密码修改',
-        component: PwdSet,
-        meta: {
-          requireAuth: true
-        }
+        component: PwdSet
       },
       {
         path: '/avatar',
         name: '头像设置',
-        component: AvatarSet,
-        meta: {
-          requireAuth: true
-        }
+        component: AvatarSet
       }
     ]
   }

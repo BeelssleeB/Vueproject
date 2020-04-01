@@ -21,7 +21,9 @@ Vue.config.productionTip = false
 Vue.use(ElementUI)
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requireAuth) {
+  if (to.path == '/' || to.path == '/login') {
+    next();
+  } else {
     if (window.localStorage.getItem("user")) {
       getRequest('/system/isAuthenticated').then(resp => {
         if (resp.status === 200) {
@@ -30,11 +32,9 @@ router.beforeEach((to, from, next) => {
         }
       }).catch(failResponse => { next('/login') });
     }
-    else{
+    else {
       next('/login')
     }
-  } else {
-    next();
   }
 })
 
