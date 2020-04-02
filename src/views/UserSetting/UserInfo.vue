@@ -100,7 +100,6 @@ export default {
         ],
         birthday: [
           {
-            type: "date",
             required: true,
             message: "请选择日期",
             trigger: "blur"

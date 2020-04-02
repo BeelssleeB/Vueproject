@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div style="margin-top:20px;display: flex;justify-content: space-between">
+    <div style="margin-top:20px;">
       <div>
         <el-input
-          placeholder="请输入用户名搜索"
+          placeholder="请输入姓名搜索"
           prefix-icon="el-icon-search"
           clearable
           @clear="initUsers"
@@ -13,20 +13,20 @@
         ></el-input>
         <el-button icon="el-icon-search" type="primary" @click="initUsers">搜索</el-button>
       </div>
-      <div>
+      <!-- <div>
         <el-button type="primary" icon="el-icon-plus" @click="showAddUser">添加用户</el-button>
-      </div>
+      </div>-->
     </div>
 
     <div style="margin-top: 20px">
-      <el-table :data="users" stripe border style="width: 100%" height="400">
+      <el-table :data="users" stripe border style="width: 100%" height="500">
         <el-table-column prop="userId" label="ID" align="center" width="110"></el-table-column>
         <el-table-column prop="userName" label="用户名" width="150"></el-table-column>
         <el-table-column prop="name" label="姓名" align="left" width="150"></el-table-column>
         <el-table-column prop="userSex" label="性别" align="left" width="100"></el-table-column>
         <el-table-column prop="phone" width="150" align="left" label="电话号码"></el-table-column>
         <el-table-column prop="birthday" width="150" align="left" label="生日日期"></el-table-column>
-        <el-table-column prop="role" width="150" label="用户角色">
+        <el-table-column prop="role" width="250" label="用户角色">
           <template slot-scope="scope">
             <el-tag
               type="success"
@@ -42,14 +42,19 @@
           </template>
         </el-table-column>
         <el-table-column prop="userSignature" width="250" label="用户签名" show-overflow-tooltip></el-table-column>
-        <el-table-column width="300" label="操作">
+        <el-table-column width="200" fixed="right" label="操作">
           <template slot-scope="scope">
             <el-button @click="showEditUser(scope.row)" size="medium" type="primary">编辑</el-button>
-            <el-button @click="deleteUser(scope.row)" size="medium" type="danger">删除</el-button>
+            <el-button
+              :disabled="scope.row.userId==user2.userId"
+              @click="deleteUser(scope.row)"
+              size="medium"
+              type="danger"
+            >删除</el-button>
           </template>
         </el-table-column>
       </el-table>
-      <div style="margin-top:20px;display: flex;justify-content: flex-end">
+      <!-- <div style="margin-top:20px;display: flex;justify-content: flex-end">
         <el-pagination
           background
           @current-change="currentChange"
@@ -59,12 +64,12 @@
           :page-sizes="[2, 4, 6, 8]"
           :page-size="2"
         ></el-pagination>
-      </div>
+      </div>-->
     </div>
 
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="编辑用户信息" :visible.sync="dialogVisible" width="28%">
       <div v-if="user">
-        <el-form :model="user" :rules="rules">
+        <el-form :model="user" ref="info" :rules="rules">
           <el-form-item label="姓名:" prop="name">
             <el-input
               type="text"
@@ -76,10 +81,10 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="性别:" prop="userSex">
-            <el-radio-group v-model="user.gender">
-              <el-radio label="1">男</el-radio>
-              <el-radio label="0">女</el-radio>
+          <el-form-item label="性别:">
+            <el-radio-group v-model="user.userSex">
+              <el-radio label="男">男</el-radio>
+              <el-radio label="女">女</el-radio>
             </el-radio-group>
           </el-form-item>
 
@@ -101,7 +106,7 @@
           </el-form-item>
 
           <el-form-item label="用户状态:" prop="enabled">
-            <el-switch disabled v-model="user.enabled" active-value="1" inactive-value="0"></el-switch>
+            <el-switch v-model="user.enabled" active-value="1" inactive-value="0"></el-switch>
           </el-form-item>
 
           <el-form-item label="个性签名:" prop="userSignature">
@@ -114,10 +119,15 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="用户角色:" prop="userRoles">
-            <el-select v-model="user.role" placeholder="用户角色">
-              <el-option v-for="item in role" :key="item" :label="item" :value="item"></el-option>
-            </el-select>
+          <el-form-item label="用户角色:">
+            <el-checkbox-group v-model="selectRoles">
+              <el-checkbox
+                style="width:150px;"
+                v-for="(roles,index) in allRoles"
+                :label="roles.id"
+                :key="index"
+              >{{roles.nameCh}}</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
 
           <el-form-item>
@@ -136,26 +146,22 @@ export default {
   data() {
     return {
       keyWord: "",
-      title: "",
       users: [],
       user: null,
-      page: 1,
-      size: 2,
-      total: 0,
+      // page: 1,
+      // size: 2,
+      // total: 0,
       dialogVisible: false,
+      selectRoles: [],
+      allRoles: [],
       rules: {
         name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        userSex: [{ required: true, message: "请选择性别", trigger: "blur" }],
         phone: [{ required: true, message: "请输入电话号码", trigger: "blur" }],
         userSignature: [
           { required: true, message: "请输入用户签名", trigger: "blur" }
         ],
-        userRoles: [
-          { required: true, message: "请选择用户角色", trigger: "blur" }
-        ],
         birthday: [
           {
-            type: "date",
             required: true,
             message: "请选择日期",
             trigger: "blur"
@@ -164,34 +170,39 @@ export default {
       }
     };
   },
+  computed: {
+    user2() {
+      return this.$store.state.currentUser;
+    }
+  },
   mounted() {
     this.initUsers();
+    this.initRoles();
   },
   methods: {
-    showAddUser() {
-      this.user = null;
-      this.title = "添加用户";
-      this.dialogVisible = true;
+    initRoles() {
+      this.getRequest("/sys/user/getallroles").then(resp => {
+        if (resp) {
+          this.allRoles = resp;
+        }
+      });
     },
     initUsers() {
-      this.getRequest(
-        "/sys/user/?page=" +
-          this.page +
-          "&size=" +
-          this.size +
-          "&keyword=" +
-          this.keyWord
-      ).then(resp => {
-        console.log(resp);
+      this.getRequest("/sys/user/?keyword=" + this.keyWord).then(resp => {
         if (resp) {
-          resp.data.filter(item => {item.userSex=(item.userSex==1)?"男":"女"})
+          resp.data.filter(item => {
+            item.userSex = item.userSex == 1 ? "男" : "女";
+          });
           this.users = resp.data;
-          this.total = resp.total;
         }
       });
     },
     showEditUser(data) {
-      this.title = "编辑用户信息";
+      let roleIds = [];
+      for (let i = 0; i < data.role.length; i++) {
+        roleIds.push(data.role[i].id);
+      }
+      this.selectRoles = roleIds;
       this.user = data;
       this.dialogVisible = true;
     },
@@ -206,11 +217,13 @@ export default {
         }
       )
         .then(() => {
-          //   this.deleteRequest("/employee/basic/" + data.id).then(resp => {
-          //     if (resp) {
-          //       this.initUsers();
-          //     }
-          //   });
+          this.deleteRequest("/sys/user/deleteuser/" + data.userId).then(
+            resp => {
+              if (resp) {
+                this.initUsers();
+              }
+            }
+          );
         })
         .catch(() => {
           this.$message({
@@ -219,18 +232,54 @@ export default {
           });
         });
     },
-    updateUserInfo() {},
-    sizeChange(currentSize) {
-      this.size = currentSize;
-      this.initUsers();
-    },
-    currentChange(currentPage) {
-      this.page = currentPage;
-      this.initUsers();
+    updateUserInfo() {
+      if (this.selectRoles.length < 1) {
+        this.$message({
+          message: "请至少选择一个角色",
+          type: "warning"
+        });
+        return false;
+      }
+      this.$refs.info.validate(valid => {
+        if (valid) {
+          let temp = [];
+          for (let i = 0; i < this.selectRoles.length; i++) {
+            let ob = {
+              id: this.selectRoles[i]
+            };
+            temp.push(ob);
+          }
+          this.user.role = temp;
+          let gender = this.user.userSex;
+          this.user.userSex = gender == "男" ? 1 : 0;
+          this.putRequest("/sys/user/updateuser", this.user)
+            .then(resp => {
+              if (resp.status === 200) {
+                this.dialogVisible = false;
+                this.initUsers();
+              }
+            })
+            .catch(failResponse => {});
+        } else {
+          return false;
+        }
+      });
     }
+    // sizeChange(currentSize) {
+    //   this.size = currentSize;
+    //   this.initUsers();
+    // },
+    // currentChange(currentPage) {
+    //   this.page = currentPage;
+    //   this.initUsers();
+    // }
   }
 };
 </script>
 
-<style scoped>
+<style>
+.el-form-item__content {
+  display: flex;
+  justify-content: flex-start;
+}
 </style>
