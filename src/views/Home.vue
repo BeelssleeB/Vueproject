@@ -14,7 +14,13 @@
                 {{user.name}}
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
-              <img width="40px;" height="40px;" style="border-radius: 50%;" :src="user.userAvatar" alt="用户头像"/>
+              <img
+                width="40px;"
+                height="40px;"
+                style="border-radius: 50%;"
+                :src="user.userAvatar"
+                alt="用户头像"
+              />
             </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="userInfo" icon="el-icon-user-solid">个人中心</el-dropdown-item>
@@ -71,9 +77,8 @@
 export default {
   name: "Home",
   data() {
-    return {
-    }
-  },    
+    return {};
+  },
 
   computed: {
     routes() {
@@ -83,7 +88,7 @@ export default {
       return this.$store.state.currentUser;
     }
   },
-  
+
   methods: {
     commandHandler(cmd) {
       if (cmd == "logout") {
@@ -97,6 +102,9 @@ export default {
               if (resp.status === 200) {
                 this.$store.commit("logout");
                 this.$router.replace("/");
+                // 清空路由，防止路由重复加载
+                // const newRouter = createRouter();
+                // this.$router.matcher = newRouter.matcher;
               }
             });
           })
