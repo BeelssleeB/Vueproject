@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import UserInfo from '../views/UserSetting/UserInfo.vue'
 import PwdSet from '../views/UserSetting/PwdSet.vue'
 import AvatarSet from '../views/UserSetting/AvatarSet.vue'
+import notFound from '../views/error/notFound.vue'
 
 Vue.use(VueRouter)
 
@@ -40,11 +41,18 @@ const routes = [
         component: AvatarSet
       }
     ]
+  },
+  {
+    path: "/404",
+    name: "notFound",
+    component: notFound
+  },
+  {
+    path: "*",
+    redirect: "/404"
   }
 ]
 
-const router = new VueRouter({
+export default new VueRouter({
   routes
 })
-
-export default router
