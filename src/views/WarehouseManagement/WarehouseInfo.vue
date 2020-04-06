@@ -1,5 +1,5 @@
 <template>
-  <div style="width:80%;">
+  <div>
     <div style="margin-top:20px;display:flex;
   justify-content: space-between;">
       <div>
@@ -12,17 +12,22 @@
           v-model="keyWord"
           @keydown.enter.native="initWares"
         ></el-input>
-        <span>类型:</span>
-        <el-select v-model="typeId" placeholder="请选择..">
+        <span style="color:#606266;margin-right:8px;">类型:</span>
+        <el-select
+          style="margin-right:10px;"
+          clearable
+          @change="initWares"
+          @clear="initWares"
+          v-model="typeId"
+          placeholder="请选择..."
+        >
           <el-option
             v-for="item in types"
             :key="item.id"
             :label="item.warehouseType"
             :value="item.id"
-            @change="initWares"
           ></el-option>
         </el-select>
-
         <el-button icon="el-icon-search" type="primary" @click="initWares">搜索</el-button>
       </div>
       <div>
@@ -33,8 +38,8 @@
     <div style="margin-top: 20px">
       <el-table :data="infos" stripe border style="width: 100%" height="400">
         <el-table-column prop="id" label="ID" align="center" width="150"></el-table-column>
-        <el-table-column prop="treasureCode" label="库房编码" align="left" width="250"></el-table-column>
-        <el-table-column prop="warehouseName" label="库房名称" align="left" width="200"></el-table-column>
+        <el-table-column prop="treasuryCode" label="库房编码" align="left" width="250"></el-table-column>
+        <el-table-column prop="warehouseName" label="库房名称" align="left" width="250"></el-table-column>
         <el-table-column
           prop="warehouseTypeClass.warehouseType"
           width="250"
@@ -43,7 +48,7 @@
         ></el-table-column>
         <el-table-column prop="node" width="250" align="left" label="节点"></el-table-column>
         <el-table-column prop="note" width="250" align="left" label="备注"></el-table-column>
-        <el-table-column width="200" label="操作">
+        <el-table-column width="250" label="操作">
           <template slot-scope="scope">
             <el-button @click="showEditWare(scope.row)" size="medium" type="primary">编辑</el-button>
             <el-button @click="deleteWare(scope.row)" size="medium" type="danger">删除</el-button>
@@ -66,8 +71,8 @@
     <el-dialog :title="title" :visible.sync="dialogVisible" width="30%">
       <div v-if="info">
         <el-form :model="info" ref="message" :rules="rules">
-          <el-form-item label="库房编码:" prop="treasureCode">
-            <el-input type="text" placeholder="请输入库房编码" v-model="info.treasureCode" autofocus></el-input>
+          <el-form-item label="库房编码:" prop="treasuryCode">
+            <el-input type="text" placeholder="请输入库房编码" v-model="info.treasuryCode" autofocus></el-input>
           </el-form-item>
 
           <el-form-item label="库房名称:" prop="warehouseName">
@@ -85,11 +90,15 @@
             </el-select>
           </el-form-item>
 
+          <el-form-item v-if="!showFlag" label="节点:" prop="node">
+            <el-input type="text" placeholder="请输入节点" v-model="info.node" autofocus></el-input>
+          </el-form-item>
+
           <el-form-item label="备注:" prop="note">
             <el-input type="text" placeholder="请输入备注" v-model="info.note" autofocus></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="updateRoleInfo">确 定</el-button>
+            <el-button type="primary" @click="updateWareInfo">确 定</el-button>
             <el-button type="info" plain @click="dialogVisible = false">取 消</el-button>
           </el-form-item>
         </el-form>
@@ -104,7 +113,7 @@ export default {
   data() {
     return {
       title: "",
-      typeId: 0,
+      typeId: "",
       showFlag: false,
       keyWord: "",
       infos: [],
@@ -115,12 +124,13 @@ export default {
       total: 0,
       dialogVisible: false,
       rules: {
-        treasureCode: [
+        treasuryCode: [
           { required: true, message: "请输入库房编码", trigger: "blur" }
         ],
         warehouseName: [
           { required: true, message: "请输入库房名称", trigger: "blur" }
-        ]
+        ],
+        node: [{ required: true, message: "请输入节点", trigger: "blur" }]
       }
     };
   },
@@ -159,13 +169,13 @@ export default {
         }
       });
     },
-    showEditRole(data) {
+    showEditWare(data) {
       this.title = "编辑库房信息";
       this.showFlag = true;
       this.info = data;
       this.dialogVisible = true;
     },
-    deleteRole(data) {
+    deleteWare(data) {
       this.$confirm(
         "此操作将永久删除库房【" + data.warehouseName + "】, 是否继续?",
         "提示",
@@ -191,7 +201,14 @@ export default {
           });
         });
     },
-    updateRoleInfo() {
+    updateWareInfo() {
+      if (!this.info.warehouseType) {
+        this.$message({
+          message: "请选择一种库房类型",
+          type: "warning"
+        });
+        return false;
+      }
       this.$refs.message.validate(valid => {
         if (valid) {
           if (this.showFlag) {
@@ -220,11 +237,11 @@ export default {
     },
     sizeChange(currentSize) {
       this.size = currentSize;
-      this.initRoles();
+      this.initWares();
     },
     currentChange(currentPage) {
       this.page = currentPage;
-      this.initRoles();
+      this.initWares();
     }
   }
 };
