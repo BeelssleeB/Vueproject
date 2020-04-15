@@ -42,15 +42,15 @@ const routes = [
       }
     ]
   },
-  {
-    path: "/404",
-    name: "notFound",
-    component: notFound
-  },
-  {
-    path: "*",
-    redirect: "/404"
-  }
+  // {
+  //   path: "/404",
+  //   name: "notFound",
+  //   component: notFound
+  // },
+  // {
+  //   path: "*",
+  //   redirect: "/404"
+  // }
 ]
 
 export default new VueRouter({

@@ -22,14 +22,14 @@
     <div style="margin-top: 20px">
       <el-table :data="nodes" stripe border style="width: 100%" height="400">
         <el-table-column prop="id" label="ID" align="center" width="150"></el-table-column>
-        <el-table-column prop="code" label="节点编码" align="left" width="250"></el-table-column>
-        <el-table-column prop="name" label="节点名称" align="left" width="250"></el-table-column>
-        <el-table-column prop="user.name" width="250" align="left" label="负责人"></el-table-column>
-        <el-table-column prop="user.phone" width="250" align="left" label="负责人电话"></el-table-column>
-        <el-table-column prop="address" width="250" align="left" label="节点地址"></el-table-column>
-        <el-table-column prop="note" width="250" align="left" label="备注"></el-table-column>
-        <el-table-column prop="createTime" width="250" align="left" label="创建时间"></el-table-column>
-        <el-table-column prop="modifyTime" width="250" align="left" label="修改时间"></el-table-column>
+        <el-table-column prop="code" label="节点编码" align="left" width="150"></el-table-column>
+        <el-table-column prop="name" label="节点名称" align="left" width="150"></el-table-column>
+        <el-table-column prop="user.name" width="150" align="left" label="负责人"></el-table-column>
+        <el-table-column prop="user.phone" width="150" align="left" label="负责人电话"></el-table-column>
+        <el-table-column prop="address" width="200" align="left" show-overflow-tooltip label="节点地址"></el-table-column>
+        <el-table-column prop="note" width="150" align="left" show-overflow-tooltip label="备注"></el-table-column>
+        <el-table-column prop="createTime" width="150" align="left" label="创建时间"></el-table-column>
+        <el-table-column prop="modifyTime" width="150" align="left" label="修改时间"></el-table-column>
         <el-table-column width="250" label="操作">
           <template slot-scope="scope">
             <el-button @click="showEditNode(scope.row)" size="medium" type="primary">编辑</el-button>
@@ -62,22 +62,22 @@
           </el-form-item>
 
           <el-form-item label="负责人:">
-            <el-select v-model="info.principal" placeholder="请选择">
+            <el-select v-model="node.principal" placeholder="请选择">
               <el-option
                 v-for="item in principals"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id"
+                :value="item.userId"
               ></el-option>
             </el-select>
           </el-form-item>
 
           <el-form-item label="地址:" prop="address">
-            <el-input type="text" placeholder="请输入地址" v-model="info.address" autofocus></el-input>
+            <el-input type="text" placeholder="请输入地址" v-model="node.address" autofocus></el-input>
           </el-form-item>
 
           <el-form-item label="备注:">
-            <el-input type="text" placeholder="请输入备注" v-model="info.note" autofocus></el-input>
+            <el-input type="text" placeholder="请输入备注" v-model="node.note" autofocus></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="updateNodeInfo">确 定</el-button>
@@ -158,7 +158,7 @@ export default {
     },
     deleteNode(data) {
       this.$confirm(
-        "此操作将永久删除库房【" + data.name + "】, 是否继续?",
+        "此操作将永久删除节点【" + data.name + "】, 是否继续?",
         "提示",
         {
           confirmButtonText: "确定",
@@ -183,7 +183,7 @@ export default {
         });
     },
     updateNodeInfo() {
-      if (!this.info.principal) {
+      if (!this.node.principal) {
         this.$message({
           message: "请选择一个负责人",
           type: "warning"
