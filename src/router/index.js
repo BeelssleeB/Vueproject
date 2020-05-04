@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import UserInfo from '../views/UserSetting/UserInfo.vue'
 import PwdSet from '../views/UserSetting/PwdSet.vue'
 import AvatarSet from '../views/UserSetting/AvatarSet.vue'
+import WebSocket from '../views/UserSetting/WebSocket.vue'
 import notFound from '../views/error/notFound.vue'
 
 Vue.use(VueRouter)
@@ -39,6 +40,11 @@ const routes = [
         path: '/avatar',
         name: '头像设置',
         component: AvatarSet
+      },
+      {
+        path: '/webSocket',
+        name: '套接字模拟',
+        component: WebSocket
       }
     ]
   },

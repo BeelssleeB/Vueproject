@@ -26,6 +26,7 @@
               <el-dropdown-item command="userInfo" icon="el-icon-user-solid">个人中心</el-dropdown-item>
               <el-dropdown-item command="modifyPassword" icon="el-icon-key">密码修改</el-dropdown-item>
               <el-dropdown-item command="modifyAvatar" icon="el-icon-picture">修改头像</el-dropdown-item>
+              <el-dropdown-item command="webSocket" icon="el-icon-d-caret">套接字模拟</el-dropdown-item>
               <el-dropdown-item command="logout" icon="el-icon-switch-button" divided>退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -120,7 +121,9 @@ export default {
         this.$router.push("/pwd");
       } else if (cmd == "modifyAvatar") {
         this.$router.push("/avatar");
-      }
+      } else if (cmd == "webSocket") {
+        this.$router.push("/webSocket");
+      } 
     }
   }
 };

@@ -62,7 +62,7 @@ export default {
       vcUrl: "system/verifyCode?time=" + new Date(),
       loginForm: {
         userName: "wang",
-        userPassword: "123456",
+        userPassword: "123",
         code: "",
         rememberMe: false
       },
