@@ -65,7 +65,7 @@
             <el-select v-model="node.principal" placeholder="请选择">
               <el-option
                 v-for="item in principals"
-                :key="item.id"
+                :key="item.userId"
                 :label="item.name"
                 :value="item.userId"
               ></el-option>
