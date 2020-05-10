@@ -25,6 +25,18 @@
         <el-table-column prop="vehicleCode" label="车辆编码" align="left" width="150"></el-table-column>
         <el-table-column prop="vehicleName" label="车辆名称" align="left" width="200"></el-table-column>
         <el-table-column prop="warehouseInfo.warehouseName" width="200" align="left" label="所在库房名"></el-table-column>
+        <el-table-column prop="vehicleStatus" width="200" label="车辆状态">
+          <template slot-scope="scope">
+            <el-switch
+              disabled
+              v-model="scope.row.vehicleStatus"
+              active-text="使用中..."
+              inactive-text="在库"
+              active-value="1"
+              inactive-value="0"
+            ></el-switch>
+          </template>
+        </el-table-column>
         <el-table-column prop="note" width="250" align="left" show-overflow-tooltip label="备注"></el-table-column>
         <el-table-column prop="createTime" width="210" align="left" label="创建时间"></el-table-column>
         <el-table-column prop="modifyTime" width="210" align="left" label="修改时间"></el-table-column>

@@ -23,11 +23,23 @@
       <el-table :data="tools" stripe border style="width: 100%" height="450">
         <el-table-column prop="id" label="ID" align="center" width="100"></el-table-column>
         <el-table-column prop="toolCode" label="工具编码" align="left" width="100"></el-table-column>
-        <el-table-column prop="toolName" label="工具名称" align="left" width="250"></el-table-column>
+        <el-table-column prop="toolName" label="工具名称" align="left" width="200"></el-table-column>
         <el-table-column prop="toolTypeName.toolType" width="150" align="left" label="工具类型"></el-table-column>
-        <el-table-column prop="toolLocation" label="工具位置" align="left" width="150"></el-table-column>
-        <el-table-column prop="unit" label="工具单位" align="left" width="150"></el-table-column>
+        <el-table-column prop="toolLocation" label="工具位置" align="left" width="100"></el-table-column>
+        <el-table-column prop="unit" label="工具单位" align="left" width="100"></el-table-column>
         <el-table-column prop="useTime" label="使用次数" align="left" width="80"></el-table-column>
+        <el-table-column prop="toolStatus" width="200" label="工具状态">
+          <template slot-scope="scope">
+            <el-switch
+              disabled
+              v-model="scope.row.toolStatus"
+              active-text="使用中..."
+              inactive-text="在库"
+              active-value="1"
+              inactive-value="0"
+            ></el-switch>
+          </template>
+        </el-table-column>
         <el-table-column prop="note" width="150" align="left" show-overflow-tooltip label="备注"></el-table-column>
         <el-table-column prop="createTime" width="120" align="left" label="创建时间"></el-table-column>
         <el-table-column prop="modifyTime" width="120" align="left" label="修改时间"></el-table-column>
@@ -120,9 +132,7 @@ export default {
         toolLocation: [
           { required: true, message: "请输入工具位置", trigger: "blur" }
         ],
-        unit: [
-          { required: true, message: "请输入工具单位", trigger: "blur" }
-        ]
+        unit: [{ required: true, message: "请输入工具单位", trigger: "blur" }]
       }
     };
   },
@@ -176,13 +186,11 @@ export default {
         }
       )
         .then(() => {
-          this.deleteRequest("/tool/type/deletetool/" + data.id).then(
-            resp => {
-              if (resp) {
-                this.initTools();
-              }
+          this.deleteRequest("/tool/type/deletetool/" + data.id).then(resp => {
+            if (resp) {
+              this.initTools();
             }
-          );
+          });
         })
         .catch(() => {
           this.$message({
@@ -202,23 +210,19 @@ export default {
       this.$refs.message.validate(valid => {
         if (valid) {
           if (this.showFlag) {
-            this.putRequest("/tool/type/updatetool", this.tool).then(
-              resp => {
-                if (resp.status === 200) {
-                  this.dialogVisible = false;
-                  this.initTools();
-                }
+            this.putRequest("/tool/type/updatetool", this.tool).then(resp => {
+              if (resp.status === 200) {
+                this.dialogVisible = false;
+                this.initTools();
               }
-            );
+            });
           } else {
-            this.postRequest("/tool/type/savetool", this.tool).then(
-              resp => {
-                if (resp.status === 200) {
-                  this.dialogVisible = false;
-                  this.initTools();
-                }
+            this.postRequest("/tool/type/savetool", this.tool).then(resp => {
+              if (resp.status === 200) {
+                this.dialogVisible = false;
+                this.initTools();
               }
-            );
+            });
           }
         } else {
           return false;
