@@ -119,6 +119,112 @@
         </el-form>
       </div>
     </el-dialog>
+
+    <el-dialog title="添加工具" :visible.sync="addToolDialogVisible" width="20%">
+      <div class="ztree">
+        <el-checkbox-group v-model="selectedTools">
+          <span v-for="(item,index) in allTools" :key="index">
+            <el-checkbox
+              style="width:145px;margin:5px;"
+              v-if="item.useTime<=5"
+              :label="item.id"
+            >{{item.toolName+"(推荐)"}}</el-checkbox>
+            <el-checkbox
+              style="width:145px;margin:5px;"
+              v-else
+              :label="item.id"
+            >{{item.toolName+"(不推荐)"}}</el-checkbox>
+          </span>
+        </el-checkbox-group>
+      </div>
+      <div class="btn">
+        <el-button size="medium" type="primary" @click="addToolItem">确 定</el-button>
+        <el-button size="medium" type="info" plain @click="addToolDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="添加车辆" :visible.sync="addVehicleDialogVisible" width="20%">
+      <div class="ztree">
+        <el-checkbox-group v-model="selectedVehicles">
+          <el-checkbox
+            style="width:120px;margin:5px;"
+            v-for="(item,index) in allVehicles"
+            :label="item.id"
+            :key="index"
+          >{{item.vehicleName}}</el-checkbox>
+        </el-checkbox-group>
+      </div>
+      <div class="btn">
+        <el-button size="medium" type="primary" @click="addVehicleItem">确 定</el-button>
+        <el-button size="medium" type="info" plain @click="addVehicleDialogVisible = false">取 消</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="新建工单" :visible.sync="worksheetDialogVisible" width="30%">
+      <div v-if="worksheet">
+        <el-form :model="worksheet" ref="table" :rules="rules">
+          <el-form-item label="工单名称:" prop="worksheetName">
+            <el-input type="text" placeholder="请输入工单名称" v-model="worksheet.worksheetName" autofocus></el-input>
+          </el-form-item>
+
+          <el-form-item label="产值:" prop="worksheetValue">
+            <el-input type="text" placeholder="请输入产值" v-model="worksheet.worksheetValue" autofocus></el-input>
+          </el-form-item>
+
+          <el-form-item label="工单类型:">
+            <el-select v-model="worksheet.worksheetType" placeholder="请选择">
+              <el-option
+                v-for="item in worksheetTypes"
+                :key="item.id"
+                :label="item.worksheetType"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="添加所用工具:">
+            <div class="ztree">
+              <el-checkbox-group v-model="selectedTools">
+                <span v-for="(item,index) in allTools" :key="index">
+                  <el-checkbox
+                    style="width:145px;margin:5px;"
+                    v-if="item.useTime<=5"
+                    :label="item.id"
+                  >{{item.toolName+"(推荐)"}}</el-checkbox>
+                  <el-checkbox
+                    style="width:145px;margin:5px;"
+                    v-else
+                    :label="item.id"
+                  >{{item.toolName+"(不推荐)"}}</el-checkbox>
+                </span>
+              </el-checkbox-group>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="添加所用车辆:">
+            <div class="ztree">
+              <el-checkbox-group v-model="selectedVehicles">
+                <el-checkbox
+                  style="width:120px;margin:5px;"
+                  v-for="(item,index) in allVehicles"
+                  :label="item.id"
+                  :key="index"
+                >{{item.vehicleName}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </el-form-item>
+
+          <el-form-item label="备注:">
+            <el-input type="text" placeholder="请输入备注" v-model="worksheet.note" autofocus></el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" @click="createWorksheetInfo">确 定</el-button>
+            <el-button type="info" plain @click="worksheetDialogVisible = false">取 消</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -131,13 +237,24 @@ export default {
       worksheets: [],
       worksheetTypes: [],
       worksheet: {},
+      selectedTools: [],
+      allTools: [],
+      selectedVehicles: [],
+      allVehicles: [],
+      title: "",
       page: 1,
       size: 4,
       total: 0,
       editDialogVisible: false,
+      addToolDialogVisible: false,
+      addVehicleDialogVisible: false,
+      worksheetDialogVisible: false,
       rules: {
         worksheetName: [
           { required: true, message: "请输入工单名称", trigger: "blur" }
+        ],
+        worksheetValue: [
+          { required: true, message: "请输入工单产值", trigger: "blur" }
         ]
       }
     };
@@ -145,12 +262,28 @@ export default {
   mounted() {
     this.initWorksheets();
     this.allTypes();
+    this.allTool();
+    this.allVehicle();
   },
   methods: {
     allTypes() {
       this.getRequest("/worksheet/info/getalltypes").then(resp => {
         if (resp) {
           this.worksheetTypes = resp;
+        }
+      });
+    },
+    allTool() {
+      this.getRequest("/worksheet/info/getalltools").then(resp => {
+        if (resp) {
+          this.allTools = resp;
+        }
+      });
+    },
+    allVehicle() {
+      this.getRequest("/worksheet/info/getallvehicles").then(resp => {
+        if (resp) {
+          this.allVehicles = resp;
         }
       });
     },
@@ -192,9 +325,117 @@ export default {
     },
     createWorksheets() {
       //新建工单
+      this.selectedTools = [];
+      this.selectedVehicles = [];
+      this.worksheet = {};
+      this.worksheetDialogVisible = true;
     },
-    addTool(data) {},
-    addVehicle(data) {},
+    addTool(data) {
+      this.selectedTools = [];
+      this.worksheet = data;
+      this.addToolDialogVisible = true;
+    },
+    addVehicle(data) {
+      this.selectedVehicles = [];
+      this.worksheet = data;
+      this.addVehicleDialogVisible = true;
+    },
+    createWorksheetInfo() {
+      if (!this.worksheet.worksheetType) {
+        this.$message({
+          message: "请选择一个工单类型",
+          type: "warning"
+        });
+        return false;
+      }
+      this.$refs.table.validate(valid => {
+        if (valid) {
+          let temp = [];
+          for (let i = 0; i < this.selectedTools.length; i++) {
+            let ob = {
+              id: this.selectedTools[i]
+            };
+            temp.push(ob);
+          }
+          this.worksheet.toolInfoList = temp;
+          let temp1 = [];
+          for (let i = 0; i < this.selectedVehicles.length; i++) {
+            let ob1 = {
+              id: this.selectedVehicles[i]
+            };
+            temp1.push(ob1);
+          }
+          this.worksheet.vehicleInfoList = temp1;
+          this.postRequest(
+            "/worksheet/info/saveworksheet",
+            this.worksheet
+          ).then(resp => {
+            if (resp.status === 200) {
+              this.worksheetDialogVisible = false;
+              this.initWorksheets();
+              this.allTool();
+              this.allVehicle();
+            }
+          });
+        } else {
+          return false;
+        }
+      });
+    },
+    addToolItem() {
+      if (this.selectedTools.length < 1) {
+        this.$message({
+          message: "请至少选择一个工具",
+          type: "warning"
+        });
+        return false;
+      }
+      let temp = [];
+      for (let i = 0; i < this.selectedTools.length; i++) {
+        let ob = {
+          id: this.selectedTools[i]
+        };
+        temp.push(ob);
+      }
+      this.worksheet.toolInfoList = temp;
+      this.putRequest("/worksheet/info/updatetool", this.worksheet)
+        .then(resp => {
+          if (resp.status === 200) {
+            this.addToolDialogVisible = false;
+            this.initWorksheets();
+            this.allTool();
+          }
+        })
+        .catch(failResponse => {});
+    },
+
+    addVehicleItem() {
+      if (this.selectedVehicles.length < 1) {
+        this.$message({
+          message: "请至少选择一个车辆",
+          type: "warning"
+        });
+        return false;
+      }
+      let temp = [];
+      for (let i = 0; i < this.selectedVehicles.length; i++) {
+        let ob = {
+          id: this.selectedVehicles[i]
+        };
+        temp.push(ob);
+      }
+      this.worksheet.vehicleInfoList = temp;
+      this.putRequest("/worksheet/info/updatevehicle", this.worksheet)
+        .then(resp => {
+          if (resp.status === 200) {
+            this.addVehicleDialogVisible = false;
+            this.initWorksheets();
+            this.allVehicle();
+          }
+        })
+        .catch(failResponse => {});
+    },
+
     finishWorksheet(data) {
       this.$confirm(
         "此操作将结束工单【" + data.worksheetName + "】, 是否继续?",
@@ -237,5 +478,21 @@ export default {
 .el-form-item__content {
   display: flex;
   justify-content: flex-start;
+}
+
+.ztree {
+  padding: 5px;
+  border: 2px solid #525151;
+  background: #ffffff;
+  width: 90%;
+  height: 350px;
+  overflow-y: scroll;
+  overflow-x: auto;
+}
+
+.btn {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 </style>
